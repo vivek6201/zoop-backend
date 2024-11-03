@@ -1,0 +1,87 @@
+enum VendorOrderStatus {
+    Pending
+    Accepted
+    Cooking
+    Finished
+    Cancelled
+    Returned
+}
+
+enum OrderPaymentType {
+    Prepaid
+    Cash
+}
+
+model VendorProfile {
+    id        String  @id @default(uuid())
+    profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+    profileId String  @unique
+
+    bussinessName    String
+    bussinessAddress String
+    phoneNumber      String
+    activeStatus     Boolean        @default(false)
+    approvedStatus   Boolean        @default(false)
+    ratings          Float          @default(0)
+    orders           VendorOrders[]
+    vendorMenu       VendorMenu?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model VendorMenu {
+    id String @id @default(uuid())
+
+    VendorProfile   VendorProfile? @relation(fields: [vendorProfileId], references: [id], onDelete: Cascade)
+    vendorProfileId String?        @unique
+    categories      DishCategory[]
+    vendorDish      VendorDish[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model DishCategory {
+    id           String       @id @default(uuid())
+    categoryName String
+    VendorDish   VendorDish[]
+    VendorMenu   VendorMenu?  @relation(fields: [vendorMenuId], references: [id], onDelete: Cascade)
+    vendorMenuId String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model VendorDish {
+    id String @id @default(uuid())
+
+    category       DishCategory @relation(fields: [dishCategoryId], references: [id])
+    dishCategoryId String
+
+    dishName        String
+    dishPrice       String
+    dishRating      Float       @default(0)
+    dishImage       String?
+    dishDescription String
+    VendorMenu      VendorMenu? @relation(fields: [vendorMenuId], references: [id], onDelete: Cascade)
+    vendorMenuId    String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model VendorOrders {
+    id              String        @id @default(uuid())
+    VendorProfile   VendorProfile @relation(fields: [vendorProfileId], references: [id], onDelete: Cascade)
+    vendorProfileId String        @unique
+
+    orderStatus              VendorOrderStatus
+    orderDeliveryAgent       DeliveryPartnerProfile @relation(fields: [deliveryPartnerProfileId], references: [id])
+    deliveryPartnerProfileId String                 @unique
+    orderPaymentType         OrderPaymentType
+    orderDetail              Json
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}

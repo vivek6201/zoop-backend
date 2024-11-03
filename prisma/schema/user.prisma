@@ -1,0 +1,81 @@
+enum Role {
+    User
+    Vendor
+    Admin
+    DeliveryPartner
+}
+
+model User {
+    id      String   @id @default(uuid())
+    name    String
+    email   String   @unique
+    role    Role
+    profile Profile?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Profile {
+    id     String @id @default(uuid())
+    userId String @unique
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    userProfile            UserProfile?
+    vendorProfile          VendorProfile?
+    adminProfile           AdminProfile?
+    deliveryPartnerProfile DeliveryPartnerProfile?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model UserProfile {
+    id        String  @id @default(uuid())
+    profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+    profileId String  @unique
+
+    phoneNumber String
+    address     String
+    dob         DateTime
+    orders      UserOrders[]
+    cart        UserCart[]
+
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+    userOrdersId String
+    userCartId   String
+}
+
+model Otp {
+    id        String @id @default(uuid())
+    otp       String
+    userEmail String
+
+    createdAt DateTime @default(now())
+    expiresAt DateTime
+}
+
+model UserOrders {
+    id String @id @default(uuid())
+
+    //add fields
+
+    UserProfile   UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+    userProfileId String
+
+    createdAt DateTime @default(now())
+    expiresAt DateTime
+}
+
+model UserCart {
+    id String @id @default(uuid())
+
+    //add fields
+
+    UserProfile   UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+    userProfileId String
+
+    createdAt DateTime @default(now())
+    expiresAt DateTime
+}

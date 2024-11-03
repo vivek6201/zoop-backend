@@ -1,0 +1,14 @@
+model DeliveryPartnerProfile {
+    id        String  @id @default(uuid())
+    Profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+    profileId String  @unique
+
+    orders         VendorOrders[]
+    phoneNumber    String
+    activeStatus   Boolean        @default(false)
+    ratings        Float          @default(0)
+    approvedStatus Boolean        @default(false)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
